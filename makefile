@@ -7,3 +7,7 @@ run: build
 
 watch:
 	reflex -s -r '\.go$$' make run
+
+# frontend
+react-build:
+	cd frontend && npm run build && cd ..
