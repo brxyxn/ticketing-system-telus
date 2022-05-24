@@ -11,3 +11,11 @@ watch:
 # frontend
 react-build:
 	cd frontend && npm run build && cd ..
+
+react-start:
+	cd frontend && npm start && cd ..
+
+# full app
+start-app:
+	make react-start && make watch
+
