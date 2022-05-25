@@ -8,6 +8,8 @@ run: build
 watch:
 	reflex -s -r '\.go$$' make run
 
+
+
 # frontend
 react-build:
 	cd frontend && npm run build && cd ..
@@ -19,3 +21,20 @@ react-start:
 start-app:
 	make react-start && make watch
 
+
+
+
+# Docker
+docker-run:
+	docker run --rm -it --name telus-container telus-tickets:latest
+
+docker-build:
+	docker build -t telus-tickets:latest .
+
+## Compose
+compose-up:
+	docker-compose up --build
+
+## Swarm for secrets
+secrets-init:
+	docker swarm init
