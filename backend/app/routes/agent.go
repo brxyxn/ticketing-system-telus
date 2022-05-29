@@ -9,8 +9,8 @@ import (
 func AgentRoutes(app *fiber.App, db *sql.DB) {
 	// // Users
 	// userRepo := postgres.NewPostgresUserRepository(db)
-	// userService := users.NewUserService(userRepo)
-	// userHandler := users.NewUserFiberHandler(userService)
+	// userService := customers.NewUserService(userRepo)
+	// userHandler := customers.NewUserFiberHandler(userService)
 
 	// api := app.Group("/api/v1")
 	// api.Get("/teams/", userHandler.RegisterAccount)

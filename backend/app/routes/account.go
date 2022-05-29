@@ -3,10 +3,10 @@ package routes
 import (
 	"database/sql"
 
+	"github.com/brxyxn/ticketing-system-telus/backend/internal/customers"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/postgres"
 	rd "github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/redis"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/middleware"
-	"github.com/brxyxn/ticketing-system-telus/backend/internal/users"
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,10 +18,10 @@ func AccountRoutes(app *fiber.App, db *sql.DB, cache *redis.Client) {
 	tokenService := middleware.NewUserService(tokenRepo)   // service
 	middleware := middleware.NewTokenHandler(tokenService) // handler
 	// user initialization
-	postgresRepo := postgres.NewPostgresUserRepository(db)        // repositories
-	uRedisRepo := rd.NewRedisUserRepository(cache)                // repositories
-	userService := users.NewUserService(postgresRepo, uRedisRepo) // services
-	userHandler := users.NewUserHandler(userService)              // controllers/handlers
+	postgresRepo := postgres.NewPostgresUserRepository(db)            // repositories
+	uRedisRepo := rd.NewRedisUserRepository(cache)                    // repositories
+	userService := customers.NewUserService(postgresRepo, uRedisRepo) // services
+	userHandler := customers.NewUserHandler(userService)              // controllers/handlers
 
 	api := app.Group("/api")
 

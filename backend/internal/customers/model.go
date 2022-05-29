@@ -1,4 +1,4 @@
-package users
+package customers
 
 type Login struct {
 	Email    string `json:"email"`

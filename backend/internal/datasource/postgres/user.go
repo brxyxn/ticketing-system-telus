@@ -3,14 +3,14 @@ package postgres
 import (
 	"database/sql"
 
-	"github.com/brxyxn/ticketing-system-telus/backend/internal/users"
+	"github.com/brxyxn/ticketing-system-telus/backend/internal/customers"
 )
 
 type userRepository struct {
 	db *sql.DB
 }
 
-func NewPostgresUserRepository(db *sql.DB) users.UserRepository {
+func NewPostgresUserRepository(db *sql.DB) customers.UserRepository {
 	return &userRepository{db}
 }
 
@@ -23,7 +23,7 @@ const (
 	qInsertProfile        = `INSERT INTO profiles (first_name, last_name, user_id) VALUES ($1, $2, $3) RETURNING *`
 )
 
-func (user *userRepository) CreateAccount(account *users.Account) error {
+func (user *userRepository) CreateAccount(account *customers.Account) error {
 	var err error
 	// validate if company exists, if not create it
 	account.Customer.CompanyID = 0
@@ -73,8 +73,8 @@ func (user *userRepository) CreateAccount(account *users.Account) error {
 	return nil
 }
 
-func (user *userRepository) GetAccountByEmail(email string) (*users.Account, error) {
-	var account users.Account
+func (user *userRepository) GetAccountByEmail(email string) (*customers.Account, error) {
+	var account customers.Account
 
 	err := user.db.QueryRow(
 		`select p.profile_id,
@@ -103,7 +103,7 @@ func (user *userRepository) GetAccountByEmail(email string) (*users.Account, err
 		&account.Company.Name,
 	)
 	if err != nil {
-		return &users.Account{}, err
+		return &customers.Account{}, err
 	}
 
 	return &account, nil

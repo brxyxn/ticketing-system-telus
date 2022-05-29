@@ -1,4 +1,4 @@
-package users
+package customers
 
 // postgres
 type UserRepository interface {
