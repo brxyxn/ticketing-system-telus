@@ -1,5 +1,5 @@
 package variables
 
 var (
-	Port = ":5000"
+	Port = "5000"
 )
