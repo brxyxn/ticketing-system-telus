@@ -4,8 +4,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/brxyxn/ticketing-system-telus/backend/app/constants"
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
-	"github.com/brxyxn/ticketing-system-telus/backend/app/variables"
 	"github.com/joho/godotenv"
 )
 
@@ -24,7 +24,7 @@ func Configure() (Config, error) {
 
 	cf.Port = os.Getenv("PORT")
 	if cf.Port == "" {
-		cf.Port = variables.Port // Default port if not set
+		cf.Port = constants.Port // Default port if not set
 	}
 
 	sql(&cf)

@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/brxyxn/ticketing-system-telus/backend/app/config"
+	"github.com/brxyxn/ticketing-system-telus/backend/app/database"
 	"github.com/brxyxn/ticketing-system-telus/backend/app/routes"
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
-	p "github.com/brxyxn/ticketing-system-telus/backend/internal/datasource"
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -30,8 +30,6 @@ type App struct {
 }
 
 func (a *App) Setup() {
-	db := p.NewHandlers(a.DB, a.Cache)
-
 	vars, err := config.Configure() // Configuring the app variables
 	if err != nil {
 		u.Log.Error("Environment variables weren't loaded correctly!", err)
@@ -40,8 +38,9 @@ func (a *App) Setup() {
 
 	a.BindAddr = ":" + vars.Port
 
+	d := database.NewHandler()
 	// Sql
-	db.InitializePostgresql(
+	a.DB = d.InitializePostgresql(
 		vars.Sql.Host,
 		vars.Sql.Port,
 		vars.Sql.User,
@@ -50,15 +49,6 @@ func (a *App) Setup() {
 		vars.Sql.Sslmode,
 	)
 
-	// // Cache
-	db.InitializeCache(
-		vars.Cache.Host+":"+vars.Cache.Port,
-		vars.Cache.Password,
-		vars.Cache.Name,
-	)
-}
-
-func (a *App) initRoutes() {
 	app := fiber.New()
 
 	// use cors with fiber v2
@@ -68,8 +58,9 @@ func (a *App) initRoutes() {
 		AllowHeaders: "Content-Type, Authorization",
 	}))
 
+	// Frontend
 	routes.ReactRoutes(app)
-
+	// API
 	routes.AccountRoutes(app, a.DB)
 	routes.CustomerRoutes(app, a.DB)
 	routes.AgentRoutes(app, a.DB)
@@ -83,7 +74,7 @@ Runs the new server.
 */
 func (a *App) Run() {
 	// Initializing routes
-	a.initRoutes()
+	// a.initRoutes()
 
 	// Creating a new server
 	a.Server = &http.Server{

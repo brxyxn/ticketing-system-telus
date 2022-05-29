@@ -1,6 +1,8 @@
 package users
 
 import (
+	"net/http"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -24,7 +26,15 @@ func NewUserFiberHandler(service UserService) UserFiberHandler {
 // And the profile is created at the same time.
 func (u *userFiberHandler) RegisterAccount(c *fiber.Ctx) error {
 	var account Account
-	c.BodyParser(&account)
+	err := c.BodyParser(&account)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(err.Error())
+	}
+
+	err = u.service.Register(&account)
+	if err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(err.Error())
+	}
 
 	return c.JSON(account)
 }
@@ -34,17 +44,3 @@ func (u *userFiberHandler) Authenticate(c *fiber.Ctx) error {
 	value := c.Params("user_id")
 	return c.JSON(value)
 }
-
-// func (u *userFiberHandler) RegisterAccount(c *fiber.Ctx) error {
-// 	var account Account
-// 	err := c.BodyParser(&account)
-// 	if err != nil {
-// 		return c.Status(http.StatusBadRequest).JSON(err.Error())
-// 	}
-
-// 	if err := u.service.Register(&account); err != nil {
-// 		return c.Status(http.StatusBadRequest).JSON(err.Error())
-// 	}
-
-// 	return c.JSON(account)
-// }
