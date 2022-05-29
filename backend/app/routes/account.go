@@ -3,9 +3,9 @@ package routes
 import (
 	"database/sql"
 
+	"github.com/brxyxn/ticketing-system-telus/backend/internal/_datasource/postgres"
+	rd "github.com/brxyxn/ticketing-system-telus/backend/internal/_datasource/redis"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/customers"
-	"github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/postgres"
-	rd "github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/redis"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/middleware"
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
