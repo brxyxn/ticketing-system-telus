@@ -2,27 +2,26 @@ package users
 
 import (
 	"errors"
-	"log"
 	"net/http"
-	"strings"
 	"time"
 
+	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 )
 
-type UserFiberHandler interface {
+type UserHandler interface {
 	RegisterAccount(c *fiber.Ctx) error
-	Authenticate(c *fiber.Ctx) error
+	Login(c *fiber.Ctx) error
 	GetUser(c *fiber.Ctx) error
 }
 
-type userFiberHandler struct {
+type userHandler struct {
 	service UserService
 }
 
-func NewUserFiberHandler(service UserService) UserFiberHandler {
-	return &userFiberHandler{service}
+func NewUserHandler(service UserService) UserHandler {
+	return &userHandler{service}
 }
 
 // This function registers a new user, and returns the account details.
@@ -30,14 +29,15 @@ func NewUserFiberHandler(service UserService) UserFiberHandler {
 // If the account is for an agent, a team will be assigned.
 // By default, the account is created with the role of customer.
 // And the profile is created at the same time.
-func (u *userFiberHandler) RegisterAccount(c *fiber.Ctx) error {
+func (a *userHandler) RegisterAccount(c *fiber.Ctx) error {
+	u.Log.Info("Registering new user")
 	var account Account
 	err := c.BodyParser(&account)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(err.Error())
 	}
 
-	err = u.service.Register(&account)
+	err = a.service.Register(&account)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(err.Error())
 	}
@@ -45,13 +45,9 @@ func (u *userFiberHandler) RegisterAccount(c *fiber.Ctx) error {
 	return c.JSON(account)
 }
 
-type Locals struct {
-	User *jwt.Token
-	Ctx  *fiber.Ctx
-}
-
 // This function returns the authentication token to validate session
-func (u *userFiberHandler) Authenticate(c *fiber.Ctx) error {
+func (a *userHandler) Login(c *fiber.Ctx) error {
+	u.Log.Info("Authenticating user")
 	var login Login
 	var err error
 
@@ -63,26 +59,27 @@ func (u *userFiberHandler) Authenticate(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	auth, err := u.service.Login(login.Email, login.Password)
+	auth, err := a.service.Login(login.Email, login.Password)
 	if err != nil || !auth.LoggedIn {
 		return c.Status(fiber.StatusUnauthorized).JSON(errors.New("Invalid email or password"))
 	}
 
-	var local Locals
-	local.Ctx = c
-	auth.Token, err = local.authenticate(auth)
+	auth.Token, err = authenticate(auth)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
 	}
 
-	err = u.service.SetAuthToken(auth)
-
-	log.Println("token", auth)
+	auth.Email = login.Email
+	auth.IP = c.IP()
+	err = a.service.SetAuthToken(auth)
+	if err != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(errors.New("error setting auth token"))
+	}
 
 	return c.JSON(fiber.Map{"token": auth.Token})
 }
 
-func (c *Locals) authenticate(login *Login) (string, error) {
+func authenticate(login *Login) (string, error) {
 	// Create the Claims
 	claims := jwt.MapClaims{
 		"email": login.Email,
@@ -101,20 +98,8 @@ func (c *Locals) authenticate(login *Login) (string, error) {
 	return t, nil
 }
 
-func (u *userFiberHandler) GetUser(c *fiber.Ctx) error {
-	var login Login
-	err := u.service.GetAuthToken(&login)
-	if err != nil {
-
-		return c.Status(fiber.StatusUnauthorized).JSON(errors.New("Invalid token"))
-	}
-	tokenString := c.GetReqHeaders()["Authorization"]
-	tokenString = strings.Replace(tokenString, "Bearer ", "", -1)
-	log.Println("tkn:", login.Token, "token:", tokenString)
-
-	if login.Token != tokenString {
-		return c.SendStatus(fiber.StatusUnauthorized)
-	}
+func (a *userHandler) GetUser(c *fiber.Ctx) error {
+	u.Log.Info("Getting user")
 
 	return c.SendString("Hello")
 }

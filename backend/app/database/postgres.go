@@ -21,7 +21,7 @@ func NewDatabaseHandler() DatabaseHandler {
 }
 
 func (d *DatabaseHdl) InitializePostgresql(host, port, user, password, dbname, sslmode string) *sql.DB {
-	u.Log.Debug("Initializing Postgresql")
+	u.Log.Info("Initializing Postgresql")
 	connectionStr := fmt.Sprintf(
 		"host=%s port=%v user=%s "+
 			"password=%s dbname=%s sslmode=%s",

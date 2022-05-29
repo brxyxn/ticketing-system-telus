@@ -49,8 +49,6 @@ func sql(cf *Config) {
 		cf.Sql.Sslmode == "" {
 		return
 	}
-	u.Log.Debug("SQL Variables:",
-		cf.Sql.Host, cf.Sql.Port, cf.Sql.User, cf.Sql.Name, cf.Sql.Password)
 }
 
 func cache(cf *Config) {
@@ -68,6 +66,4 @@ func cache(cf *Config) {
 		cf.Cache.Name < 0 {
 		return
 	}
-
-	u.Log.Debug("Cache Variables:", cf.Cache.Host, cf.Cache.Port, cf.Cache.Name, cf.Cache.Password)
 }

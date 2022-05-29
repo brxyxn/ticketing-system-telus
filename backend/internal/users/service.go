@@ -13,7 +13,6 @@ type UserService interface {
 	Register(account *Account) error
 
 	SetAuthToken(login *Login) error
-	GetAuthToken(login *Login) error
 }
 
 type userService struct {
@@ -68,8 +67,4 @@ func (s *userService) Login(email, password string) (*Login, error) {
 
 func (s *userService) SetAuthToken(login *Login) error {
 	return s.cacheRepo.SetAuthToken(login)
-}
-
-func (s *userService) GetAuthToken(login *Login) error {
-	return s.cacheRepo.GetAuthToken(login)
 }

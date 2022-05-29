@@ -9,5 +9,4 @@ type UserRepository interface {
 // redis
 type TokenRepository interface {
 	SetAuthToken(login *Login) error
-	GetAuthToken(login *Login) error
 }

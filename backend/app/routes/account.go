@@ -5,31 +5,39 @@ import (
 
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/postgres"
 	rd "github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/redis"
+	"github.com/brxyxn/ticketing-system-telus/backend/internal/middleware"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/users"
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 )
 
 func AccountRoutes(app *fiber.App, db *sql.DB, cache *redis.Client) {
-	api := app.Group("/api/v1")
 
-	// repositories
-	postgresRepo := postgres.NewPostgresUserRepository(db)
-	redisRepo := rd.NewRedisUserRepository(cache)
-	// services
-	userService := users.NewUserService(postgresRepo, redisRepo)
-	// controllers/handlers
-	userHandler := users.NewUserFiberHandler(userService)
+	// token initialization
+	tokenRepo := rd.NewRedisTokenRepository(cache)         // repository
+	tokenService := middleware.NewUserService(tokenRepo)   // service
+	middleware := middleware.NewTokenHandler(tokenService) // handler
+	// user initialization
+	postgresRepo := postgres.NewPostgresUserRepository(db)        // repositories
+	uRedisRepo := rd.NewRedisUserRepository(cache)                // repositories
+	userService := users.NewUserService(postgresRepo, uRedisRepo) // services
+	userHandler := users.NewUserHandler(userService)              // controllers/handlers
+
+	api := app.Group("/api")
 
 	// Accounts for customers
 	api.Post("/customer/register", userHandler.RegisterAccount) // register profile, user and [customer + company | agent + team]
-	api.Post("/customer/login", userHandler.Authenticate)       // login user
-	api.Get("/customer/user", userHandler.GetUser)              // returns user profile
+	api.Post("/customer/login", userHandler.Login)              // login user
+
+	// v1 routes
+	v1 := api.Group("/v1", middleware.Validate)
+
+	v1.Get("/customer/user", userHandler.GetUser) // returns user profile
 
 	// Accounts for agents
-	api.Post("/agent/register", userHandler.RegisterAccount) // register profile, user and [customer + company | agent + team]
-	api.Post("/agent/login", userHandler.Authenticate)       // login user
-	api.Get("/agent/user", userHandler.RegisterAccount)      // returns user profile
+	v1.Post("/agent/register", userHandler.RegisterAccount) // register profile, user and [customer + company | agent + team]
+	v1.Post("/agent/login", userHandler.Login)              // login user
+	v1.Get("/agent/user", userHandler.RegisterAccount)      // returns user profile
 
-	api.Get("/logout", userHandler.RegisterAccount) // logout user
+	v1.Get("/logout", userHandler.RegisterAccount) // logout user
 }

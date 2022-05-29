@@ -1,28 +1,24 @@
 package redis
 
 import (
-	"log"
+	"time"
 
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/users"
 	"github.com/go-redis/redis"
 )
 
-type userRepository struct {
+// TODO: request device information like browser, os, device, etc. to be stored in redis
+// instead of the IP address.
+
+type tokenRepository struct {
 	cache *redis.Client
 }
 
 func NewRedisUserRepository(redis *redis.Client) users.TokenRepository {
-	return &userRepository{redis}
+	return &tokenRepository{redis}
 }
 
-func (user *userRepository) SetAuthToken(login *users.Login) error {
-	err := user.cache.Set(login.Email, login.Token, 0).Err()
-	log.Println("setting token:", login.Token)
-	return err
-}
-
-func (user *userRepository) GetAuthToken(login *users.Login) error {
-	err := user.cache.Get(login.Email).Scan(&login.Token)
-	log.Println("getting token:", login.Token)
+func (t *tokenRepository) SetAuthToken(login *users.Login) error {
+	err := t.cache.Set(login.Email+login.IP, login.Token, 2*time.Minute).Err()
 	return err
 }

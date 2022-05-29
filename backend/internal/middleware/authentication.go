@@ -5,7 +5,6 @@ import (
 
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 type TokenHandler interface {
@@ -14,11 +13,10 @@ type TokenHandler interface {
 
 type tokenHandler struct {
 	service UserService
-	store   *session.Store
 }
 
-func NewTokenHandler(service UserService, store *session.Store) TokenHandler {
-	return &tokenHandler{service, store}
+func NewTokenHandler(service UserService) TokenHandler {
+	return &tokenHandler{service}
 }
 
 func (a *tokenHandler) Validate(c *fiber.Ctx) error {

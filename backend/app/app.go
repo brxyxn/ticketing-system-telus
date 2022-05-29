@@ -16,6 +16,7 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 type App struct {
@@ -58,6 +59,7 @@ func (a *App) Setup() {
 
 	app := fiber.New()
 
+	store := session.New()
 	// use cors with fiber v2
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
