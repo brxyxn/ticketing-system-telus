@@ -16,7 +16,7 @@ type DatabaseHdl struct {
 	db *sql.DB
 }
 
-func NewHandler() DatabaseHandler {
+func NewDatabaseHandler() DatabaseHandler {
 	return &DatabaseHdl{}
 }
 

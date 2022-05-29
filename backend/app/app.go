@@ -38,7 +38,7 @@ func (a *App) Setup() {
 
 	a.BindAddr = ":" + vars.Port
 
-	d := database.NewHandler()
+	d := database.NewDatabaseHandler()
 	// Sql
 	a.DB = d.InitializePostgresql(
 		vars.Sql.Host,
@@ -47,6 +47,13 @@ func (a *App) Setup() {
 		vars.Sql.Password,
 		vars.Sql.Name,
 		vars.Sql.Sslmode,
+	)
+
+	c := database.NewCacheHandler()
+	a.Cache = c.InitializeRedis(
+		vars.Cache.Host+":"+vars.Cache.Port,
+		vars.Cache.Password,
+		vars.Cache.Name,
 	)
 
 	app := fiber.New()
@@ -58,6 +65,20 @@ func (a *App) Setup() {
 		AllowHeaders: "Content-Type, Authorization",
 	}))
 
+	// app.Post("/login", Authenticate)
+
+	// api := app.Group("/api/v1")
+
+	// api.Post("/login", Authenticate)
+	// JWT Middleware
+	// api.Use(jwtware.New(jwtware.Config{
+	// 	SigningKey: []byte("secret"),
+	// }))
+	// api.Get("/restricted", restricted)
+
+	// api := app.Group("/api/v1", middleware.Authenticate)
+	// api.Get("/", restricted)
+
 	// Frontend
 	routes.ReactRoutes(app)
 	// API
@@ -66,16 +87,54 @@ func (a *App) Setup() {
 	routes.AgentRoutes(app, a.DB)
 	routes.TicketRoutes(app, a.DB)
 
+	// middleware.Authenticate(&fiber.Ctx{})
+
 	app.Listen(a.BindAddr)
 }
+
+// type Login struct {
+// 	Email    string `json:"email"`
+// 	Password string `json:"password"`
+// }
+
+// func Authenticate(c *fiber.Ctx) error {
+// 	var login Login
+// 	c.BodyParser(&login)
+
+// 	if login.Email == "" || login.Password == "" {
+// 		return c.SendStatus(fiber.StatusBadGateway)
+// 	}
+
+// 	// Create the Claims
+// 	claims := jwt.MapClaims{
+// 		"email": login.Email,
+// 		"admin": true,
+// 		"exp":   time.Now().Add(time.Hour * 1).Unix(),
+// 	}
+
+// 	// Create token
+// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+// 	// Generate encoded token and send it as response.
+// 	t, err := token.SignedString([]byte("secret"))
+// 	if err != nil {
+// 		return c.SendStatus(fiber.StatusInternalServerError)
+// 	}
+
+// 	return c.JSON(fiber.Map{"token": t})
+// }
+
+// func restricted(c *fiber.Ctx) error {
+// 	user := c.Locals("user").(*jwt.Token)
+// 	claims := user.Claims.(jwt.MapClaims)
+// 	name := claims["email"].(string)
+// 	return c.SendString("Welcome " + name)
+// }
 
 /*
 Runs the new server.
 */
 func (a *App) Run() {
-	// Initializing routes
-	// a.initRoutes()
-
 	// Creating a new server
 	a.Server = &http.Server{
 		Addr:         a.BindAddr,        // configure the bind address
