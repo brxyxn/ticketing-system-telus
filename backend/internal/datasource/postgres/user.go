@@ -16,7 +16,7 @@ func NewPostgresUserRepository(db *sql.DB) users.UserRepository {
 
 func (user *userRepository) CreateAccount(account *users.Account) error {
 	// base
-	user.db.QueryRow("INSERT INTO users (email, password, first_name, last_name, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", account.Email, account.Password, account.FirstName, account.LastName)
+	user.db.QueryRow("INSERT INTO users (email, password, first_name, last_name, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id", account.User.Email, account.User.Password, account.Profile.FirstName, account.Profile.LastName)
 
 	return nil
 }

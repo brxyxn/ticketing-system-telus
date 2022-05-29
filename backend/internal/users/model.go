@@ -7,10 +7,10 @@ type Login struct {
 }
 
 type Account struct {
-	User
-	Profile
-	Customer
-	Company
+	User     User     `json:"user"`
+	Profile  Profile  `json:"profile"`
+	Customer Customer `json:"customer"`
+	Company  Company  `json:"company"`
 }
 
 type User struct {
