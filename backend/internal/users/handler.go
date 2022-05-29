@@ -1,7 +1,6 @@
 package users
 
 import (
-	"errors"
 	"net/http"
 	"time"
 
@@ -34,12 +33,12 @@ func (a *userHandler) RegisterAccount(c *fiber.Ctx) error {
 	var account Account
 	err := c.BodyParser(&account)
 	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(err.Error())
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	err = a.service.Register(&account)
 	if err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(err.Error())
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	return c.JSON(account)
@@ -53,27 +52,27 @@ func (a *userHandler) Login(c *fiber.Ctx) error {
 
 	err = c.BodyParser(&login)
 	if err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	if login.Email == "" || login.Password == "" {
-		return c.SendStatus(fiber.StatusUnauthorized)
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "missing credentials"})
 	}
 
 	auth, err := a.service.Login(login.Email, login.Password)
 	if err != nil || !auth.LoggedIn {
-		return c.Status(fiber.StatusUnauthorized).JSON(errors.New("Invalid email or password"))
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "invalid credentials"})
 	}
 
 	auth.Token, err = authenticate(auth)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	auth.Email = login.Email
 	auth.IP = c.IP()
 	err = a.service.SetAuthToken(auth)
 	if err != nil {
-		c.Status(fiber.StatusInternalServerError).JSON(errors.New("error setting auth token"))
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "error setting auth token"})
 	}
 
 	return c.JSON(fiber.Map{"token": auth.Token})
@@ -101,5 +100,5 @@ func authenticate(login *Login) (string, error) {
 func (a *userHandler) GetUser(c *fiber.Ctx) error {
 	u.Log.Info("Getting user")
 
-	return c.SendString("Hello")
+	return c.JSON(fiber.Map{"response": "Hello"})
 }

@@ -16,7 +16,6 @@ import (
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 type App struct {
@@ -59,7 +58,6 @@ func (a *App) Setup() {
 
 	app := fiber.New()
 
-	store := session.New()
 	// use cors with fiber v2
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: "*",
@@ -93,45 +91,6 @@ func (a *App) Setup() {
 
 	app.Listen(a.BindAddr)
 }
-
-// type Login struct {
-// 	Email    string `json:"email"`
-// 	Password string `json:"password"`
-// }
-
-// func Authenticate(c *fiber.Ctx) error {
-// 	var login Login
-// 	c.BodyParser(&login)
-
-// 	if login.Email == "" || login.Password == "" {
-// 		return c.SendStatus(fiber.StatusBadGateway)
-// 	}
-
-// 	// Create the Claims
-// 	claims := jwt.MapClaims{
-// 		"email": login.Email,
-// 		"admin": true,
-// 		"exp":   time.Now().Add(time.Hour * 1).Unix(),
-// 	}
-
-// 	// Create token
-// 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-// 	// Generate encoded token and send it as response.
-// 	t, err := token.SignedString([]byte("secret"))
-// 	if err != nil {
-// 		return c.SendStatus(fiber.StatusInternalServerError)
-// 	}
-
-// 	return c.JSON(fiber.Map{"token": t})
-// }
-
-// func restricted(c *fiber.Ctx) error {
-// 	user := c.Locals("user").(*jwt.Token)
-// 	claims := user.Claims.(jwt.MapClaims)
-// 	name := claims["email"].(string)
-// 	return c.SendString("Welcome " + name)
-// }
 
 /*
 Runs the new server.
