@@ -1,18 +1,16 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	a "github.com/brxyxn/ticketing-system-telus/backend/app"
+	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
+)
 
 func main() {
-	app := fiber.New()
+	a := a.App{}
 
-	app.Static("/", "./backend/build", fiber.Static{
-		Index: "index.html",
-	})
-	app.Get("/api", handlerApi)
+	a.L = u.InitLogs("telus-api")
 
-	app.Listen(":5000")
-}
+	a.Setup() // Setup database and cache
 
-func handlerApi(c *fiber.Ctx) error {
-	return c.SendString("Hello Golang!")
+	a.Run() // Run the app
 }
