@@ -82,7 +82,7 @@ func (a *App) Setup() {
 	// Frontend
 	routes.ReactRoutes(app)
 	// API
-	routes.AccountRoutes(app, a.DB)
+	routes.AccountRoutes(app, a.DB, a.Cache)
 	routes.CustomerRoutes(app, a.DB)
 	routes.AgentRoutes(app, a.DB)
 	routes.TicketRoutes(app, a.DB)

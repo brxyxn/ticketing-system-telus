@@ -3,26 +3,28 @@ package users
 import (
 	"errors"
 	"os"
-	"time"
 
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
-	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
-	Login(username, password string) (*Login, error)
+	Login(email, password string) (*Login, error)
 	Register(account *Account) error
+
+	SetAuthToken(login *Login) error
+	GetAuthToken(login *Login) error
 }
 
 type userService struct {
-	repo UserRepository
-	key  []byte
+	dbRepo    UserRepository
+	cacheRepo TokenRepository
+	key       []byte
 }
 
-func NewUserService(repository UserRepository) UserService {
+func NewUserService(databaseRepository UserRepository, cacheRepository TokenRepository) UserService {
 	key := os.Getenv("SECRET_KEY")
-	return &userService{repository, []byte(key)}
+	return &userService{databaseRepository, cacheRepository, []byte(key)}
 }
 
 func (s *userService) Register(account *Account) error {
@@ -34,7 +36,7 @@ func (s *userService) Register(account *Account) error {
 
 	account.User.Password = string(passwordHash)
 
-	err = s.repo.CreateAccount(account)
+	err = s.dbRepo.CreateAccount(account)
 	if err != nil {
 		u.Log.Error(err)
 		return err
@@ -46,37 +48,28 @@ func (s *userService) Register(account *Account) error {
 }
 
 func (s *userService) Login(email, password string) (*Login, error) {
-	account, err := s.repo.GetAccountByEmail(email)
+	account, err := s.dbRepo.GetAccountByEmail(email)
 	if err != nil {
 		u.Log.Error(err)
-		return nil, err
+		return &Login{LoggedIn: false}, err
 	}
 	if account == nil {
-		return nil, errors.New("Invalid email")
+		return &Login{LoggedIn: false}, errors.New("Invalid email")
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(account.User.Password), []byte(password)); err != nil {
-		return nil, errors.New("Invalid password")
-	}
-
-	token, err := s.getToken(account)
-	if err != nil {
-		return nil, err
+		return &Login{LoggedIn: false}, errors.New("Invalid password")
 	}
 
 	return &Login{
-		Email: email,
-		Token: token,
+		LoggedIn: true,
 	}, nil
 }
 
-func (s *userService) getToken(account *Account) (string, error) {
-	token := jwt.New(jwt.SigningMethodHS256)
+func (s *userService) SetAuthToken(login *Login) error {
+	return s.cacheRepo.SetAuthToken(login)
+}
 
-	claims := token.Claims.(jwt.MapClaims)
-
-	claims["sub"] = account.User.UserID
-	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-
-	return token.SignedString(s.key)
+func (s *userService) GetAuthToken(login *Login) error {
+	return s.cacheRepo.GetAuthToken(login)
 }

@@ -82,6 +82,7 @@ func (user *userRepository) GetAccountByEmail(email string) (*users.Account, err
 			p.last_name,
 			u.user_id,
 			u.email,
+			u.password,
 			u.status,
 			cx.customer_id,
 			c.name
@@ -90,7 +91,17 @@ func (user *userRepository) GetAccountByEmail(email string) (*users.Account, err
 			inner join customers cx on cx.customer_id = u.customer_id
 			inner join companies c on c.company_id = cx.company_id
 		where u.email = $1`, email,
-	).Scan(&account.Profile.ProfileID, &account.Profile.FirstName, &account.Profile.LastName, &account.User.Email, &account.User.Status, &account.Customer.CustomerID, &account.Company.Name)
+	).Scan(
+		&account.Profile.ProfileID,
+		&account.Profile.FirstName,
+		&account.Profile.LastName,
+		&account.User.UserID,
+		&account.User.Email,
+		&account.User.Password,
+		&account.User.Status,
+		&account.Customer.CustomerID,
+		&account.Company.Name,
+	)
 	if err != nil {
 		return &users.Account{}, err
 	}
