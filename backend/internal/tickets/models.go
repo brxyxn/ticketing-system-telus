@@ -10,6 +10,7 @@ type Ticket struct {
 	StatusID    int64  `json:"status_id"`
 	CreatedAt   string `json:"-"`
 	UpdatedAt   string `json:"-"`
+	ClosedAt    string `json:"closed_at"`
 }
 
 type Status struct {
@@ -36,4 +37,15 @@ type Case struct {
 	Status   bool  `json:"status"`
 	AgentID  int64 `json:"agent_id"`
 	TierID   int64 `json:"tier_id"`
+}
+
+type Incident struct {
+	UserID int64 `json:"user_id"`
+	CaseID int64 `json:"case_id"`
+}
+
+type UserTickets struct {
+	Tickets   []Ticket   `json:"tickets"`
+	Cases     []Case     `json:"cases"`
+	Incidents []Incident `json:"incidents"`
 }
