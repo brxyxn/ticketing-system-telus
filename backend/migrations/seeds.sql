@@ -45,9 +45,43 @@ values ('email@example4.com', 'password', 4);
 insert into users(email, password, customer_id)
 values ('email@example5.com', 'password', 4);
 -- profiles for customers
-insert into profiles(first_name, last_name, user_id) values ('John', 'Doe', 1);
-insert into profiles(first_name, last_name, user_id) values ('John', 'Smith', 2);
-insert into profiles(first_name, last_name, user_id) values ('Carl', 'Doe', 3);
-insert into profiles(first_name, last_name, user_id) values ('Seidy', 'Doe', 4);
-insert into profiles(first_name, last_name, user_id) values ('Gabriella', 'Smith', 5);
+insert into profiles(first_name, last_name, user_id)
+values ('John', 'Doe', 1);
+insert into profiles(first_name, last_name, user_id)
+values ('John', 'Smith', 2);
+insert into profiles(first_name, last_name, user_id)
+values ('Carl', 'Doe', 3);
+insert into profiles(first_name, last_name, user_id)
+values ('Seidy', 'Doe', 4);
+insert into profiles(first_name, last_name, user_id)
+values ('Gabriella', 'Smith', 5);
 --------------------------------------------------------------------------------
+-- agents
+insert into agents (team_id, team_lead)
+values(1, true);
+insert into agents (team_id, team_lead)
+values(1, false);
+insert into agents (team_id, team_lead)
+values(1, false);
+insert into agents (team_id, team_lead)
+values(1, false);
+insert into agents (team_id, team_lead)
+values(2, true);
+insert into agents (team_id, team_lead)
+values(2, false);
+insert into agents (team_id, team_lead)
+values(2, false);
+insert into agents (team_id, team_lead)
+values(2, false);
+--------------------------------------------------------------------------------
+-- statuses
+insert into statuses (title, by_default)
+values ('Created', true);
+insert into statuses (title, by_default)
+values ('Escalated', true);
+insert into statuses (title, by_default)
+values ('Closed', true);
+insert into statuses (title, by_default)
+values ('Combined', true);
+insert into statuses (title, by_default)
+values ('Merged', true);
