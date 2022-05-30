@@ -82,7 +82,7 @@ func authenticate(login *Login) (string, error) {
 	// Create the Claims
 	claims := jwt.MapClaims{
 		"email": login.Email,
-		"exp":   time.Now().Add(time.Hour * 1).Unix(),
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
 	}
 
 	// Create token
