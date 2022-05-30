@@ -4,13 +4,11 @@ go 1.18
 
 require (
 	github.com/gofiber/fiber/v2 v2.34.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v4 v4.4.1
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 )
 
 require (
-	github.com/gofiber/jwt/v3 v3.2.12 // indirect
-	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.12.1 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -26,7 +24,6 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.4 // indirect
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/jackc/pgx/v4 v4.16.1
 	github.com/joho/godotenv v1.4.0
