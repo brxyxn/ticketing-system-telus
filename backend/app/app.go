@@ -65,27 +65,13 @@ func (a *App) Setup() {
 		AllowHeaders: "Content-Type, Authorization",
 	}))
 
-	// app.Post("/login", Authenticate)
-
-	// api := app.Group("/api/v1")
-
-	// api.Post("/login", Authenticate)
-	// JWT Middleware
-	// api.Use(jwtware.New(jwtware.Config{
-	// 	SigningKey: []byte("secret"),
-	// }))
-	// api.Get("/restricted", restricted)
-
-	// api := app.Group("/api/v1", middleware.Authenticate)
-	// api.Get("/", restricted)
-
 	// Frontend
 	routes.ReactRoutes(app)
 	// API
 	routes.AccountRoutes(app, a.DB, a.Cache)
 	routes.CustomerRoutes(app, a.DB)
 	routes.AgentRoutes(app, a.DB)
-	routes.TicketRoutes(app, a.DB)
+	routes.TicketRoutes(app, a.DB, a.Cache)
 
 	// middleware.Authenticate(&fiber.Ctx{})
 
