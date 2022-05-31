@@ -4,8 +4,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/brxyxn/ticketing-system-telus/backend/app/constants"
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
-	"github.com/brxyxn/ticketing-system-telus/backend/app/variables"
 	"github.com/joho/godotenv"
 )
 
@@ -24,7 +24,7 @@ func Configure() (Config, error) {
 
 	cf.Port = os.Getenv("PORT")
 	if cf.Port == "" {
-		cf.Port = variables.Port // Default port if not set
+		cf.Port = constants.Port // Default port if not set
 	}
 
 	sql(&cf)
@@ -49,8 +49,6 @@ func sql(cf *Config) {
 		cf.Sql.Sslmode == "" {
 		return
 	}
-	u.Log.Debug("SQL Variables:",
-		cf.Sql.Host, cf.Sql.Port, cf.Sql.User, cf.Sql.Name, cf.Sql.Password)
 }
 
 func cache(cf *Config) {
@@ -68,6 +66,4 @@ func cache(cf *Config) {
 		cf.Cache.Name < 0 {
 		return
 	}
-
-	u.Log.Debug("Cache Variables:", cf.Cache.Host, cf.Cache.Port, cf.Cache.Name, cf.Cache.Password)
 }

@@ -1,4 +1,4 @@
-package datsource
+package database
 
 import (
 	"database/sql"
@@ -8,8 +8,19 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-func (h *Handlers) InitializePostgresql(host, port, user, password, dbname, sslmode string) {
-	u.Log.Debug("Initializing Postgresql")
+type DatabaseHandler interface {
+	InitializePostgresql(host, port, user, password, dbname, sslmode string) *sql.DB
+}
+
+type DatabaseHdl struct {
+	db *sql.DB
+}
+
+func NewDatabaseHandler() DatabaseHandler {
+	return &DatabaseHdl{}
+}
+
+func (d *DatabaseHdl) InitializePostgresql(host, port, user, password, dbname, sslmode string) *sql.DB {
 	connectionStr := fmt.Sprintf(
 		"host=%s port=%v user=%s "+
 			"password=%s dbname=%s sslmode=%s",
@@ -17,17 +28,18 @@ func (h *Handlers) InitializePostgresql(host, port, user, password, dbname, sslm
 	)
 
 	var err error
-	h.db, err = sql.Open("pgx", connectionStr)
+	d.db, err = sql.Open("pgx", connectionStr)
 	if err != nil {
 		u.Log.Error("Error opening a new connection to the DB.", err)
-		return
+		return &sql.DB{}
 	}
 
-	err = h.db.Ping()
+	err = d.db.Ping()
 	if err != nil {
-		h.db.Close()
+		d.db.Close()
 		u.Log.Error(err)
-		return
+		return &sql.DB{}
 	}
 	u.Log.Info("Connected to database", dbname, "with user", user, "at", host+":"+port)
+	return d.db
 }

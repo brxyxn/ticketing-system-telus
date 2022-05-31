@@ -10,10 +10,9 @@ import (
 	"time"
 
 	"github.com/brxyxn/ticketing-system-telus/backend/app/config"
+	"github.com/brxyxn/ticketing-system-telus/backend/app/database"
+	"github.com/brxyxn/ticketing-system-telus/backend/app/routes"
 	u "github.com/brxyxn/ticketing-system-telus/backend/app/utils"
-	p "github.com/brxyxn/ticketing-system-telus/backend/internal/datasource"
-	"github.com/brxyxn/ticketing-system-telus/backend/internal/datasource/postgres"
-	"github.com/brxyxn/ticketing-system-telus/backend/internal/users"
 	"github.com/go-redis/redis"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -31,8 +30,6 @@ type App struct {
 }
 
 func (a *App) Setup() {
-	db := p.NewHandlers(a.DB, a.Cache)
-
 	vars, err := config.Configure() // Configuring the app variables
 	if err != nil {
 		u.Log.Error("Environment variables weren't loaded correctly!", err)
@@ -41,8 +38,9 @@ func (a *App) Setup() {
 
 	a.BindAddr = ":" + vars.Port
 
+	d := database.NewDatabaseHandler()
 	// Sql
-	db.InitializePostgresql(
+	a.DB = d.InitializePostgresql(
 		vars.Sql.Host,
 		vars.Sql.Port,
 		vars.Sql.User,
@@ -51,58 +49,31 @@ func (a *App) Setup() {
 		vars.Sql.Sslmode,
 	)
 
-	// // Cache
-	db.InitializeCache(
+	c := database.NewCacheHandler()
+	a.Cache = c.InitializeRedis(
 		vars.Cache.Host+":"+vars.Cache.Port,
 		vars.Cache.Password,
 		vars.Cache.Name,
 	)
-}
 
-func (a *App) initRoutes() {
 	app := fiber.New()
 
 	// use cors with fiber v2
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:3000",
+		AllowOrigins: "*",
 		AllowMethods: "GET, POST, PUT, DELETE",
 		AllowHeaders: "Content-Type, Authorization",
 	}))
 
-	app.Static("/", "./build", fiber.Static{
-		Index: "index.html",
-	})
+	// Frontend
+	routes.ReactRoutes(app)
+	// API
+	routes.AccountRoutes(app, a.DB, a.Cache)
+	routes.CustomerRoutes(app, a.DB)
+	routes.AgentRoutes(app, a.DB)
+	routes.TicketRoutes(app, a.DB, a.Cache)
 
-	api := app.Group("/api/v1")
-
-	// Users
-	userRepo := postgres.NewPostgresUserRepository(a.DB)
-	userService := users.NewUserService(userRepo)
-	userHandler := users.NewUserFiberHandler(userService)
-
-	// Accounts
-	api.Get("/register", userHandler.RegisterAccount) // register profile, user and [customer + company | agent + team]
-	api.Get("/login", userHandler.RegisterAccount)    // login user
-	api.Get("/user", userHandler.RegisterAccount)     // returns user profile
-	api.Get("/logout", userHandler.RegisterAccount)   // logout user
-
-	// customer routes
-	api.Get("/customers", userHandler.RegisterAccount)
-	api.Get("/customers/:user_id", userHandler.Authenticate)
-
-	// agent routes
-	api.Get("/teams/", userHandler.RegisterAccount)
-	api.Get("/teams/:team_id", userHandler.RegisterAccount)
-	api.Get("/tiers", userHandler.RegisterAccount)
-	api.Get("/tiers/:tier_id", userHandler.RegisterAccount)
-
-	// ticket routes
-	api.Get("/tickets", userHandler.RegisterAccount)
-	api.Get("/tickets/:ticket_id", userHandler.RegisterAccount)
-	api.Get("/tickets/:ticket_id/comments", userHandler.RegisterAccount)
-
-	// route for tracking of history of tickets
-	api.Get("/tickets/:ticket_id/history", userHandler.RegisterAccount)
+	// middleware.Authenticate(&fiber.Ctx{})
 
 	app.Listen(a.BindAddr)
 }
@@ -111,9 +82,6 @@ func (a *App) initRoutes() {
 Runs the new server.
 */
 func (a *App) Run() {
-	// Initializing routes
-	a.initRoutes()
-
 	// Creating a new server
 	a.Server = &http.Server{
 		Addr:         a.BindAddr,        // configure the bind address

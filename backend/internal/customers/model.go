@@ -1,16 +1,18 @@
-package users
+package customers
 
 type Login struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 	Token    string `json:"token"`
+	IP       string `json:"ip"`
+	LoggedIn bool
 }
 
 type Account struct {
-	User
-	Profile
-	Customer
-	Company
+	User     User     `json:"user"`
+	Profile  Profile  `json:"profile"`
+	Customer Customer `json:"customer"`
+	Company  Company  `json:"company"`
 }
 
 type User struct {

@@ -19,10 +19,10 @@ CREATE TABLE "tickets"(
     "title" VARCHAR(255) NOT NULL,
     "description" TEXT NOT NULL,
     "case_id" INTEGER NOT NULL,
-    "status_id" INTEGER NOT NULL,
-    "created_at" TIMESTAMP(0) WITH TIME zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(0) WITH TIME zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "closed_at" TIMESTAMP(0) WITH TIME zone NOT NULL
+    "status_id" INTEGER DEFAULT 1,
+    "created_at" TIMESTAMP(0) WITH TIME zone DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(0) WITH TIME zone DEFAULT CURRENT_TIMESTAMP,
+    "closed_at" TIMESTAMP(0) WITH TIME zone
 );
 ALTER TABLE "tickets"
 ADD PRIMARY KEY("ticket_id");
@@ -33,14 +33,14 @@ CREATE TABLE "comments"(
     "body" TEXT NOT NULL,
     "ticket_id" INTEGER NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "created_at" TIMESTAMP(0) WITH TIME zone NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "created_at" TIMESTAMP(0) WITH TIME zone DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE "comments"
 ADD PRIMARY KEY("comment_id");
 CREATE TABLE "statuses"(
     "status_id" INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY,
     "title" VARCHAR(255) NOT NULL,
-    "by_default" BOOLEAN NULL
+    "by_default" BOOLEAN NULL DEFAULT FALSE
 );
 ALTER TABLE "statuses"
 ADD PRIMARY KEY("status_id");
@@ -64,9 +64,9 @@ COMMENT ON COLUMN "history"."made_by" IS 'change or event created by the user...
 COMMENT ON COLUMN "history"."ticket_id" IS 'index ticket_id';
 CREATE TABLE "cases"(
     "case_id" INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY,
-    "assigned" BOOLEAN NOT NULL,
-    "status" BOOLEAN NOT NULL,
-    "agent_id" INTEGER NOT NULL,
+    "assigned" BOOLEAN DEFAULT FALSE,
+    "status" BOOLEAN DEFAULT TRUE,
+    "agent_id" INTEGER NULL,
     "tier_id" INTEGER NOT NULL
 );
 ALTER TABLE "cases"
@@ -167,12 +167,9 @@ CREATE TABLE "messages"(
 ALTER TABLE "messages"
 ADD PRIMARY KEY("message_id");
 CREATE TABLE "incidents"(
-    "incident_id" INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY,
     "user_id" INTEGER NOT NULL,
     "case_id" INTEGER NOT NULL
 );
-ALTER TABLE "incidents"
-ADD PRIMARY KEY("incident_id");
 CREATE INDEX "incidents_user_id_index" ON "incidents"("user_id");
 CREATE INDEX "incidents_case_id_index" ON "incidents"("case_id");
 ALTER TABLE "tickets"
