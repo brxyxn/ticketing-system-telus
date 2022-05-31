@@ -12,6 +12,6 @@ export default class GetTickets extends React.Component {
     }
 
     render() {
-        return <div>{this.props.test}</div>;
+        return <h1>{this.props.test}</h1>;
     }
 }
