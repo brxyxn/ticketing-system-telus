@@ -4,6 +4,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 export class Register extends React.Component {
     constructor(props) {
@@ -21,32 +22,23 @@ export class Register extends React.Component {
     async handleSubmit(event) {
         event.preventDefault();
 
-        if (this.state.password === this.state.repeatPassword) {
-            var _headers = {
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-            };
+        const account = {
+            user: {
+                email: this.state.email,
+                password: this.state.password,
+            },
+            profile: {
+                first_name: this.state.firstname,
+                last_name: this.state.lastname,
+            },
+            company: {
+                name: this.state.company,
+            },
+        };
 
+        if (this.state.password === this.state.repeatPassword) {
             await axios
-                .post(
-                    "http://localhost:5000/api/customer/register",
-                    JSON.stringify({
-                        user: {
-                            email: this.state.email,
-                            password: this.state.password,
-                        },
-                        profile: {
-                            first_name: this.state.firstname,
-                            last_name: this.state.lastname,
-                        },
-                        company: {
-                            name: this.state.company,
-                        },
-                    }),
-                    _headers
-                )
+                .post("http://localhost:5000/api/customer/register", account)
                 .then((response) => {
                     window.location.href = "/login";
                 })
@@ -55,8 +47,6 @@ export class Register extends React.Component {
                 });
         }
     }
-
-    componentDidMount() {}
 
     render() {
         return (

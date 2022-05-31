@@ -3,6 +3,7 @@ package postgres
 import (
 	"database/sql"
 
+	"github.com/brxyxn/ticketing-system-telus/backend/app/utils"
 	"github.com/brxyxn/ticketing-system-telus/backend/internal/customers"
 )
 
@@ -57,6 +58,7 @@ func (user *userRepository) CreateAccount(account *customers.Account) error {
 		account.User.Email, account.User.Password, account.User.CustomerId,
 	).Scan(&account.User.UserID)
 	if err != nil {
+		utils.Log.Debug(&account.User.Email, &account.User.Password, &account.User.CustomerId)
 		user.db.QueryRow(qDeleteCustomerOnFail, account.Customer.CustomerID)
 		return err
 	}
