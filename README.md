@@ -12,6 +12,12 @@ Tech Stack used in this project:
 -   [Docker Compose 2.5.0](https://docs.docker.com/compose/)
 -   [Ubuntu](https://ubuntu.com/)
 
+# Database ER-Diagram
+
+[Live Diagram](https://drawsql.app/clever-solutions/diagrams/telustickets)
+
+![er-diagram](./preview/er-diagram.png)
+
 # Using Docker Compose
 
 ## Clone
