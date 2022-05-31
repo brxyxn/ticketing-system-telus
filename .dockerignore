@@ -5,12 +5,15 @@
 
 **/bin/
 **/build/
-**/.vscode
+
+**/README.md
+
+**/*akefile
+**/*Dockerfile*
+**/*-compose.yml
+**/migration/
 
 ##################
-
-# Created by https://www.toptal.com/developers/gitignore/api/go,react,node
-# Edit at https://www.toptal.com/developers/gitignore?templates=go,react,node
 
 ### Go ###
 # If you prefer the allow list template instead of the deny list, see community template:
@@ -81,7 +84,7 @@ bower_components
 build/Release
 
 # Dependency directories
-**/node_modules/
+node_modules/
 jspm_packages/
 
 # Snowpack dependency directory (https://snowpack.dev/)

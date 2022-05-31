@@ -1,0 +1,79 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: telus-app
+    ports:
+      - 5000:5000
+    environment:
+      - PG_HOST=${PG_HOST}
+      - PG_PORT=${PG_PORT}
+      - PG_USER=${PG_USER}
+      - PG_NAME=${PG_NAME}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_SSLMODE=${PG_SSLMODE}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_NAME=${REDIS_NAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - telus-network
+
+  postgres:
+    image: postgres:14.3-alpine3.15
+    container_name: postgres_db
+    restart: on-failure
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/pg_secret_file
+      POSTGRES_DB: ${PG_NAME}
+      DATABASE_HOST: ${PG_HOST}
+    volumes:
+      - ./database:/docker-entrypoint-initdb.d
+      - database-config:/etc/postgresql
+      - database-data:/var/lib/postgresql/data
+    networks:
+      - telus-network
+    secrets:
+      - pg_secret_file
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4:6.9
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    secrets:
+      - pg_secret_file
+    networks:
+      - telus-network
+
+  redis:
+    image: redis:7.0.0-alpine3.15
+    container_name: redis_cache
+    restart: on-failure
+    volumes:
+      - cache-redis:/data
+    depends_on:
+      - postgres
+    networks:
+      - telus-network
+
+volumes:
+  database-config:
+  database-data:
+  cache-redis:
+
+
+networks:
+  telus-network:
+    driver: bridge
+
+secrets:
+  pg_secret_file:
+    file: pg_secret.txt
