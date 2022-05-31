@@ -35,7 +35,7 @@ func (user *userRepository) CreateAccount(account *customers.Account) error {
 	}
 
 	if account.Company.CompanyID == 0 {
-		err = user.db.QueryRow(qInsertCompany, &account.Company.Name).Scan(account.Company.CompanyID)
+		err = user.db.QueryRow(qInsertCompany, &account.Company.Name).Scan(&account.Company.CompanyID)
 	}
 	account.Customer.CompanyID = account.Company.CompanyID
 
