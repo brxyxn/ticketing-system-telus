@@ -4,30 +4,30 @@ This is a sample project started as a technical test.
 
 Tech Stack used in this project:
 
--   [Golang 1.18](https://go.dev)
--   [React 18.1.0](https://reactjs.org/)
--   [PostgreSQL 14.3](https://www.postgresql.org)
--   [Redis 7.0.0](https://redis.io/)
--   [Docker 20.10.16](https://www.docker.com/get-started)
--   [Docker Compose 2.5.0](https://docs.docker.com/compose/)
--   [Ubuntu](https://ubuntu.com/)
+- [Golang 1.18](https://go.dev)
+- [React 18.1.0](https://reactjs.org/)
+- [PostgreSQL 14.3](https://www.postgresql.org)
+- [Redis 7.0.0](https://redis.io/)
+- [Docker 20.10.16](https://www.docker.com/get-started)
+- [Docker Compose 2.5.0](https://docs.docker.com/compose/)
+- [Ubuntu](https://ubuntu.com/)
 
-# Database ER-Diagram
+## Database ER-Diagram
 
 [Live Diagram](https://drawsql.app/clever-solutions/diagrams/telustickets)
 
 ![er-diagram](./preview/er-diagram.png)
 
-# Using Docker Compose
+## Using Docker Compose
 
-## Clone
+### Clone
 
 ```sh
 git clone git@github.com:brxyxn/ticketing-system-telus.git
 cd ticketing-system-telus
 ```
 
-## Docker Swarm
+### Docker Swarm
 
 Initialize docker swarm
 
@@ -41,7 +41,7 @@ In case you have multiple network ids, please specify the `--advertise-addr` fla
 docker swarm init --advertise-addr # format: <ip|interface>[:port]
 ```
 
-## Docker Secrets
+### Docker Secrets
 
 Create your secrets file and specify a secret password, see example:
 
@@ -55,7 +55,7 @@ echo "secret_password" > pg_secrets.txt
 secret_password
 ```
 
-## Env file
+### Env file
 
 `./.env`
 
@@ -79,7 +79,7 @@ PGADMIN_EMAIL=admin@admin.com
 PGADMIN_PASSWORD=admin
 ```
 
-## Execute
+### Execute
 
 ```sh
 docker-compose up --build
@@ -87,6 +87,6 @@ docker-compose up --build
 docker compose up --build
 ```
 
-## Open
+### Open
 
 Open your browser and enter to [localhost:3000](http://localhost:3000/)
